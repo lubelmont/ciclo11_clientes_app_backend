@@ -2,6 +2,7 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const { Sequelize } = require('sequelize');
+//const Cliente = require('./models/Client.js'); 
 
 
 //Database connection
@@ -22,7 +23,35 @@ sequelize.authenticate()
     });
 //Test the connection
 
+const Cliente = sequelize.define('Cliente', {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    nombre: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    apellido: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    correo: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    fecha_nacimiento: {
+      type: Sequelize.DATE,
+      allowNull: false
+    },
+  },
+  {
+    timestamps: false, // Disable createdAt and updatedAt fields
+    tableName: 'clientes' // Specify the table name if it differs from the model name
+  }
 
+);
 
 
 const app = express();
@@ -99,6 +128,76 @@ app.post('/api/intro', (req, res) => {
         message: `Hello ${name}, welcome to the API!`
     });
 });
+
+
+
+
+
+/**
+ * @swagger
+ * /api/v1/listAllclients:
+ *   get:
+ *     summary: Retrieve a list of all clients.
+ *     description: This endpoint fetches all clients from the database.
+ *     responses:
+ *       200:
+ *         description: A list of clients.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: The ID of the client.
+ *                     example: 1
+ *                   nombre:
+ *                     type: string
+ *                     description: The first name of the client.
+ *                     example: Juan
+ *                   apellido:
+ *                     type: string
+ *                     description: The last name of the client.
+ *                     example: Pérez
+ *                   fecha_nacimiento:
+ *                     type: string
+ *                     format: date
+ *                     description: The birth date of the client.
+ *                     example: 1990-05-15
+ *                   correo:
+ *                     type: string
+ *                     description: The email of the client.
+ *                     example: juan.perez@example.com
+ *                   is_deleted:
+ *                     type: integer
+ *                     description: Logical deletion status (0 = active, 1 = deleted).
+ *                     example: 0
+ *       500:
+ *         description: Internal Server Error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *                   example: Internal Server Error
+ */
+app.get('/api/v1/listAllclients', async (req, res) => {
+  
+  try {
+    const clients = await Cliente.findAll();
+    console.log( clients);
+    res.json(clients);
+  } catch (error) {
+    console.error('Error fetching clients:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 
