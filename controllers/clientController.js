@@ -29,3 +29,16 @@ exports.listAllclients= async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   };
+
+  exports.createClient = async (req, res) => {
+    console.log('Body recibido:', req.body);  
+    const { nombre, apellido, correo} = req.body;
+
+    try {
+      const newClient = await Cliente.create({ nombre, apellido, correo });
+      res.status(201).json(newClient);
+    } catch (error) {
+      console.error('Error creating client:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
